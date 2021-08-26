@@ -1,0 +1,8 @@
+[
+    {
+        "token": "<TOKEN>",
+        "refresh_token": "<REFRESH>",
+        "client_secret": "<CLIENT_SECRET>",
+        "client_id": "<CLIENT_ID>"
+    }
+]
