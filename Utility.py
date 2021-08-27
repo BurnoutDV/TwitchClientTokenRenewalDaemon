@@ -97,7 +97,7 @@ def token_refresh(refresh: str, client_id: str, client_secret:str) -> dict:
         "client_secret": client_secret
     }
     r = requests.post(url, data=package)
-    if not r.status == 200:
+    if not r.status_code == 200:
         logger.error(f"request returned with code {r.status} instead of 200")
         handle_response_error(r.text)
         return {}

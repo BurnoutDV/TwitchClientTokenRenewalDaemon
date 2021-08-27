@@ -40,6 +40,18 @@ from datetime import datetime, timedelta
 
 logging.basicConfig(filename="log.log", format="%(asctime)s - %(levelname)s: %(message)s", level=logging.INFO)
 
+
+def boiler_plate_expiration(a_token: dict):
+    status = Utility.token_validate(a_token['token'])
+    if status:
+        then = datetime.now() + timedelta(seconds=int(status['expires_in']))
+        a_token['expiration_date'] = then.isoformat()
+        if int(status['expires_in']) > 60 * 30:  # aka. 30 minutes:
+            return False
+        return True
+    return True
+
+
 if __name__ == "__main__":
     # Load basic config file, see tokens.example.json
     tokens = Utility.load_generic_json(TOKEN_FILE)
@@ -50,17 +62,14 @@ if __name__ == "__main__":
         if 'active' not in a_token:
             a_token['active'] = True # initial set
         if a_token['active']:
-            status = Utility.token_validate(a_token['token'])
-            if status:
-                then = datetime.now() + timedelta(seconds=int(status['expires_in']))
-                a_token['expiration_date'] = then.isoformat()
-                if int(status['expires_in']) > 60*30:  # aka. 30 minutes:
-                    continue
+            if not boiler_plate_expiration(a_token):
+                continue
+
             resp = Utility.token_refresh(a_token['refresh_token'], a_token['client_id'], a_token['client_secret'])
             if resp:
                 a_token['token'] = resp['access_token']
                 a_token['scope'] = resp['scope']
-
+                boiler_plate_expiration(a_token)
             else:
                 a_token['active'] = False
     try:
